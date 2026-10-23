@@ -35,10 +35,14 @@ class VitalControllerTest {
     @Autowired
     private VitalRepository vitalRepository;
 
+    @Autowired
+    private com.shms.alert.AlertRepository alertRepository;
+
     private Patient testPatient;
 
     @BeforeEach
     void setUp() {
+        alertRepository.deleteAll();
         vitalRepository.deleteAll();
         patientRepository.deleteAll();
 

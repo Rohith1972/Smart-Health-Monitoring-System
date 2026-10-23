@@ -45,6 +45,12 @@ public class Patient {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @jakarta.persistence.OneToMany(mappedBy = "patient", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<com.shms.vital.Vital> vitals = new java.util.ArrayList<>();
+
+    @jakarta.persistence.OneToMany(mappedBy = "patient", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<com.shms.alert.Alert> alerts = new java.util.ArrayList<>();
+
     public Patient() {
     }
 

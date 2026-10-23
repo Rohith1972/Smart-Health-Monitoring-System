@@ -13,10 +13,14 @@ public class VitalService {
 
     private final VitalRepository vitalRepository;
     private final PatientRepository patientRepository;
+    private final com.shms.alert.AlertService alertService;
 
-    public VitalService(VitalRepository vitalRepository, PatientRepository patientRepository) {
+    public VitalService(VitalRepository vitalRepository,
+                        PatientRepository patientRepository,
+                        com.shms.alert.AlertService alertService) {
         this.vitalRepository = vitalRepository;
         this.patientRepository = patientRepository;
+        this.alertService = alertService;
     }
 
     @Transactional
@@ -35,6 +39,7 @@ public class VitalService {
         );
 
         Vital saved = vitalRepository.save(vital);
+        alertService.evaluateVitalsAndGenerateAlerts(saved);
         return VitalResponse.fromEntity(saved);
     }
 
