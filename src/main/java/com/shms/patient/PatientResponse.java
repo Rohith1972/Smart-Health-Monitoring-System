@@ -13,10 +13,15 @@ public record PatientResponse(
         String bloodGroup,
         String address,
         String medicalNotes,
+        Long assignedDoctorId,
+        String assignedDoctorName,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
     public static PatientResponse fromEntity(Patient patient) {
+        Long docId = patient.getAssignedDoctor() != null ? patient.getAssignedDoctor().getId() : null;
+        String docName = patient.getAssignedDoctor() != null ? patient.getAssignedDoctor().getFullName() : null;
+
         return new PatientResponse(
                 patient.getId(),
                 patient.getFullName(),
@@ -27,6 +32,8 @@ public record PatientResponse(
                 patient.getBloodGroup(),
                 patient.getAddress(),
                 patient.getMedicalNotes(),
+                docId,
+                docName,
                 patient.getCreatedAt(),
                 patient.getUpdatedAt()
         );

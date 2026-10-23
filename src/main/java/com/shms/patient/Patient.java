@@ -51,6 +51,10 @@ public class Patient {
     @jakarta.persistence.OneToMany(mappedBy = "patient", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private java.util.List<com.shms.alert.Alert> alerts = new java.util.ArrayList<>();
 
+    @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+    @jakarta.persistence.JoinColumn(name = "doctor_id")
+    private com.shms.doctor.Doctor assignedDoctor;
+
     public Patient() {
     }
 
@@ -164,5 +168,13 @@ public class Patient {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public com.shms.doctor.Doctor getAssignedDoctor() {
+        return assignedDoctor;
+    }
+
+    public void setAssignedDoctor(com.shms.doctor.Doctor assignedDoctor) {
+        this.assignedDoctor = assignedDoctor;
     }
 }
