@@ -1,13 +1,12 @@
-package com.shms.smarthealthmonitoringsystem;
+package com.shms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SmartHealthMonitoringSystemApplication {
+public class ShmsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SmartHealthMonitoringSystemApplication.class, args);
+        SpringApplication.run(ShmsApplication.class, args);
     }
-
 }

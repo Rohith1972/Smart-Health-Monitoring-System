@@ -1,13 +1,12 @@
-package com.shms.smarthealthmonitoringsystem;
+package com.shms;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SmartHealthMonitoringSystemApplicationTests {
+class ShmsApplicationTests {
 
     @Test
     void contextLoads() {
     }
-
 }

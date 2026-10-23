@@ -1,0 +1,262 @@
+{
+  "info": {
+    "_postman_id": "shms-phase1-collection",
+    "name": "SHMS - Phase 1 (Patient Management)",
+    "description": "Postman collection for Smart Health Monitoring System - Phase 1 Patient Endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "patientId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Register Patient (Success)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201 Created\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "if (jsonData && jsonData.id) {",
+              "    pm.collectionVariables.set(\"patientId\", jsonData.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+1-555-0199\",\n  \"dateOfBirth\": \"1990-05-15\",\n  \"gender\": \"Male\",\n  \"bloodGroup\": \"O+\",\n  \"address\": \"742 Evergreen Terrace, Springfield\",\n  \"medicalNotes\": \"Mild seasonal allergies, no known drug intolerances\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/patients",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "patients"]
+        }
+      }
+    },
+    {
+      "name": "2. Register Patient (Negative - Duplicate Email 409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 409 Conflict\", function () {",
+              "    pm.response.to.have.status(409);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Duplicate John\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+1-555-0200\",\n  \"dateOfBirth\": \"1992-01-01\",\n  \"gender\": \"Male\",\n  \"bloodGroup\": \"A+\",\n  \"address\": \"Springfield\",\n  \"medicalNotes\": \"None\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/patients",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "patients"]
+        }
+      }
+    },
+    {
+      "name": "3. Register Patient (Negative - Validation Failure 400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 Bad Request\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"\",\n  \"email\": \"not-a-valid-email\",\n  \"phone\": \"123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/patients",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "patients"]
+        }
+      }
+    },
+    {
+      "name": "4. Get All Patients",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/patients",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "patients"]
+        }
+      }
+    },
+    {
+      "name": "5. Get Patient By ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/patients/{{patientId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "patients", "{{patientId}}"]
+        }
+      }
+    },
+    {
+      "name": "6. Get Patient By ID (Negative - 404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/patients/99999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "patients", "99999"]
+        }
+      }
+    },
+    {
+      "name": "7. Update Patient Details",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Jonathan Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+1-555-9999\",\n  \"dateOfBirth\": \"1990-05-15\",\n  \"gender\": \"Male\",\n  \"bloodGroup\": \"O+\",\n  \"address\": \"1000 Hospital Boulevard, Suite 4B\",\n  \"medicalNotes\": \"Asthma controlled with inhaler\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/patients/{{patientId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "patients", "{{patientId}}"]
+        }
+      }
+    },
+    {
+      "name": "8. Delete Patient",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 204 No Content\", function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/patients/{{patientId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "patients", "{{patientId}}"]
+        }
+      }
+    }
+  ]
+}
