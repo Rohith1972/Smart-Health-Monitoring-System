@@ -1,0 +1,347 @@
+{
+  "info": {
+    "_postman_id": "shms-master-complete-collection",
+    "name": "Smart Health Monitoring System (SHMS) - Complete Master Collection",
+    "description": "Full end-to-end Postman collection covering all 6 phases: Authentication & JWT, Patient Management, Vital Statistics, Alert Engine, Doctor Management & Dashboard, and Security edge cases.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwtToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "doctorId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "vitalId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "alertId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Phase 5 - Auth & JWT",
+      "item": [
+        {
+          "name": "1. Register Admin User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () { pm.response.to.have.status(201); });",
+                  "var data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set(\"jwtToken\", data.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_user\",\n  \"password\": \"AdminSecret2026!\",\n  \"role\": \"ROLE_ADMIN\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "2. Login Admin User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () { pm.response.to.have.status(200); });",
+                  "var data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set(\"jwtToken\", data.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_user\",\n  \"password\": \"AdminSecret2026!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "3. Negative Login - Bad Credentials (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_user\",\n  \"password\": \"WrongPassword!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 1 - Patient Management",
+      "item": [
+        {
+          "name": "1. Register Patient",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () { pm.response.to.have.status(201); });",
+                  "var data = pm.response.json();",
+                  "if (data.id) { pm.collectionVariables.set(\"patientId\", data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Michael Scott\",\n  \"email\": \"michael.scott@dundermifflin.com\",\n  \"phone\": \"+1-555-0144\",\n  \"dateOfBirth\": \"1965-03-15\",\n  \"gender\": \"Male\",\n  \"bloodGroup\": \"A+\",\n  \"address\": \"Scranton Business Park, PA\",\n  \"medicalNotes\": \"Mild hypertension and occasional asthma\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/patients", "host": ["{{baseUrl}}"], "path": ["api", "patients"] }
+          }
+        },
+        {
+          "name": "2. Get All Patients",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/patients", "host": ["{{baseUrl}}"], "path": ["api", "patients"] }
+          }
+        },
+        {
+          "name": "3. Get Patient by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/patients/{{patientId}}", "host": ["{{baseUrl}}"], "path": ["api", "patients", "{{patientId}}"] }
+          }
+        },
+        {
+          "name": "4. Update Patient Details",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Michael G. Scott\",\n  \"email\": \"michael.scott@dundermifflin.com\",\n  \"phone\": \"+1-555-0199\",\n  \"dateOfBirth\": \"1965-03-15\",\n  \"gender\": \"Male\",\n  \"bloodGroup\": \"A+\",\n  \"address\": \"Scranton Executive Suite\",\n  \"medicalNotes\": \"Controlled with regular checkups\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/patients/{{patientId}}", "host": ["{{baseUrl}}"], "path": ["api", "patients", "{{patientId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 2 - Vital Statistics",
+      "item": [
+        {
+          "name": "1. Submit Normal Vital Reading",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () { pm.response.to.have.status(201); });",
+                  "var data = pm.response.json();",
+                  "if (data.id) { pm.collectionVariables.set(\"vitalId\", data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heartRateBpm\": 74,\n  \"systolicBloodPressure\": 118,\n  \"diastolicBloodPressure\": 78,\n  \"oxygenSaturation\": 98.5,\n  \"temperatureCelsius\": 36.6\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/patients/{{patientId}}/vitals", "host": ["{{baseUrl}}"], "path": ["api", "patients", "{{patientId}}", "vitals"] }
+          }
+        },
+        {
+          "name": "2. Submit Abnormal Vital Reading (Triggers Alerts)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heartRateBpm\": 142,\n  \"systolicBloodPressure\": 155,\n  \"diastolicBloodPressure\": 96,\n  \"oxygenSaturation\": 89.0,\n  \"temperatureCelsius\": 39.2\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/patients/{{patientId}}/vitals", "host": ["{{baseUrl}}"], "path": ["api", "patients", "{{patientId}}", "vitals"] }
+          }
+        },
+        {
+          "name": "3. Get Patient Vital History",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/patients/{{patientId}}/vitals", "host": ["{{baseUrl}}"], "path": ["api", "patients", "{{patientId}}", "vitals"] }
+          }
+        },
+        {
+          "name": "4. Get Latest Patient Vital",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/patients/{{patientId}}/vitals/latest", "host": ["{{baseUrl}}"], "path": ["api", "patients", "{{patientId}}", "vitals", "latest"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 3 - Alert Management",
+      "item": [
+        {
+          "name": "1. Get Patient Alerts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () { pm.response.to.have.status(200); });",
+                  "var data = pm.response.json();",
+                  "if (data.length > 0) { pm.collectionVariables.set(\"alertId\", data[0].id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/patients/{{patientId}}/alerts", "host": ["{{baseUrl}}"], "path": ["api", "patients", "{{patientId}}", "alerts"] }
+          }
+        },
+        {
+          "name": "2. Get Alert by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/alerts/{{alertId}}", "host": ["{{baseUrl}}"], "path": ["api", "alerts", "{{alertId}}"] }
+          }
+        },
+        {
+          "name": "3. Acknowledge Alert",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/alerts/{{alertId}}/acknowledge", "host": ["{{baseUrl}}"], "path": ["api", "alerts", "{{alertId}}", "acknowledge"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 4 - Doctor & Dashboard",
+      "item": [
+        {
+          "name": "1. Create Doctor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () { pm.response.to.have.status(201); });",
+                  "var data = pm.response.json();",
+                  "if (data.id) { pm.collectionVariables.set(\"doctorId\", data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Dr. Leonard McCoy\",\n  \"email\": \"mccoy@starfleet.org\",\n  \"specialization\": \"Cardiology & Emergency Medicine\",\n  \"phone\": \"+1-555-0170\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/doctors", "host": ["{{baseUrl}}"], "path": ["api", "doctors"] }
+          }
+        },
+        {
+          "name": "2. Assign Patient to Doctor",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/patients/{{patientId}}", "host": ["{{baseUrl}}"], "path": ["api", "doctors", "{{doctorId}}", "patients", "{{patientId}}"] }
+          }
+        },
+        {
+          "name": "3. Get Doctor's Assigned Patients",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/patients", "host": ["{{baseUrl}}"], "path": ["api", "doctors", "{{doctorId}}", "patients"] }
+          }
+        },
+        {
+          "name": "4. Get Doctor Health Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/dashboard", "host": ["{{baseUrl}}"], "path": ["api", "doctors", "{{doctorId}}", "dashboard"] }
+          }
+        }
+      ]
+    }
+  ]
+}

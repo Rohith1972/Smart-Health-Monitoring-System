@@ -16,13 +16,16 @@ public class AlertService {
     private final AlertRepository alertRepository;
     private final PatientRepository patientRepository;
     private final AlertThresholdConfig thresholds;
+    private final com.shms.websocket.NotificationService notificationService;
 
     public AlertService(AlertRepository alertRepository,
                         PatientRepository patientRepository,
-                        AlertThresholdConfig thresholds) {
+                        AlertThresholdConfig thresholds,
+                        com.shms.websocket.NotificationService notificationService) {
         this.alertRepository = alertRepository;
         this.patientRepository = patientRepository;
         this.thresholds = thresholds;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -80,7 +83,12 @@ public class AlertService {
         }
 
         if (!alerts.isEmpty()) {
-            return alertRepository.saveAll(alerts);
+            List<Alert> savedAlerts = alertRepository.saveAll(alerts);
+            Long docId = patient.getAssignedDoctor() != null ? patient.getAssignedDoctor().getId() : null;
+            for (Alert savedAlert : savedAlerts) {
+                notificationService.broadcastAlert(AlertResponse.fromEntity(savedAlert), docId);
+            }
+            return savedAlerts;
         }
         return alerts;
     }

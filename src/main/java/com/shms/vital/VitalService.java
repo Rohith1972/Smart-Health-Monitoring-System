@@ -14,13 +14,16 @@ public class VitalService {
     private final VitalRepository vitalRepository;
     private final PatientRepository patientRepository;
     private final com.shms.alert.AlertService alertService;
+    private final com.shms.websocket.NotificationService notificationService;
 
     public VitalService(VitalRepository vitalRepository,
                         PatientRepository patientRepository,
-                        com.shms.alert.AlertService alertService) {
+                        com.shms.alert.AlertService alertService,
+                        com.shms.websocket.NotificationService notificationService) {
         this.vitalRepository = vitalRepository;
         this.patientRepository = patientRepository;
         this.alertService = alertService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -40,7 +43,12 @@ public class VitalService {
 
         Vital saved = vitalRepository.save(vital);
         alertService.evaluateVitalsAndGenerateAlerts(saved);
-        return VitalResponse.fromEntity(saved);
+
+        VitalResponse response = VitalResponse.fromEntity(saved);
+        Long docId = patient.getAssignedDoctor() != null ? patient.getAssignedDoctor().getId() : null;
+        notificationService.broadcastVitalReading(response, docId);
+
+        return response;
     }
 
     @Transactional(readOnly = true)
